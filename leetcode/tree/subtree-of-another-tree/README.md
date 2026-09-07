@@ -1,39 +1,40 @@
-# 572. Subtree of Another Tree
-
 ## Problem
-Determine if a binary tree `subRoot` is a subtree of another binary tree `root`. A subtree must have the exact same structure and node values.
+Given two binary trees, determine if the second tree is a subtree of the first. A subtree includes all descendants.
 
 ## Approach
-The correct approach uses two recursive functions.
-First, a helper function `isSameTree(p, q)` checks if two trees are identical. It returns `true` if both are `null`, `false` if one is `null` and the other isn't, or if their values differ. Otherwise, it recursively checks their left and right subtrees.
-Second, the main `isSubtree(root, subRoot)` function. It first checks if `subRoot` is `null` (always a subtree) or if `root` is `null` (and `subRoot` isn't). Then, it calls `isSameTree(root, subRoot)` to see if the current `root` matches `subRoot`. If not, it recursively calls `isSubtree` on `root.left` OR `root.right` to search deeper.
+This solution uses a recursive Depth-First Search (DFS).
+It has two main parts:
+1.  A helper function checks if two trees are identical. It compares node values and recursively checks left and right subtrees.
+2.  The main function traverses the larger tree. At each node, it calls the helper to see if the subtree rooted there is identical to the smaller tree. If not, it recursively checks the left and right children.
 
 ## Complexity
-*   **Time:** O(N * M). N is the number of nodes in `root`, M is in `subRoot`. The `isSubtree` function visits each of N nodes. For each `root` node, `isSameTree` might traverse all M nodes of `subRoot`.
-*   **Space:** O(max(N, M)). This is due to the maximum depth of the recursion stack for both `root` and `subRoot` traversals.
+*   **Time:** O(N * M). N is nodes in the main tree, M is nodes in the subtree. In the worst case, we compare the subtree at every node of the main tree.
+*   **Space:** O(N + M). This is due to the recursion stack depth. It can go as deep as N levels for the main tree traversal, plus M levels for each identity check.
 
 ## Review
-The accepted solution is logically flawed. It incorrectly combines the logic for checking if two trees are identical and searching for a subtree.
-When `root.val == subRoot.val`, it tries to check for identity. However, if a mismatch occurs deeper, it incorrectly attempts to search for `subRoot` within the mismatched branch.
-For example, `root = [1, 1, null]` and `subRoot = [1]` should return `true`. The flawed solution returns `false`. It fails because `check(root.left=[1], subRoot.left=null)` incorrectly returns `false` instead of allowing the `isSubtree` logic to continue.
+The code is clear and well-structured. It separates checking tree identity from traversing the main tree. Base cases are handled correctly for both recursive functions. This is a standard and readable solution for the problem.
 
 ## Improvements
-The main improvement is to separate the concerns into two distinct, correct recursive functions.
-The `isSameTree` helper function should strictly check for exact tree identity.
-The `isSubtree` function should use this helper while traversing the main tree. This separation makes the logic clear, correct, and easier to debug.
+The accepted solution is not strictly optimal in time complexity.
+A more efficient approach uses tree serialization combined with string matching.
+Serialize both trees into unique string representations, including null markers and delimiters.
+Then, use an algorithm like Knuth-Morris-Pratt (KMP) to check if the smaller tree's string is a substring of the larger tree's string.
+This optimized approach achieves O(N + M) time complexity.
 
 ## Takeaways
-*   **Divide and Conquer with Helper Functions:** Break down complex problems into smaller, well-defined sub-problems. `isSameTree` is a perfect helper for `isSubtree`.
-*   **Careful Base Cases:** Correctly handle `null` nodes in tree problems. Distinguish between `(null, null)` (match) and `(null, non-null)` (mismatch).
-*   **Nested Recursion Pattern:** Many tree problems involve an outer recursion to traverse the main tree and an inner recursion for specific checks at each node.
-*   **Understanding Problem Constraints:** Analyze N and M to estimate complexity and determine if an O(N*M) solution is acceptable.
+*   **Recursive Tree Traversal (DFS):** Essential for visiting all nodes in a tree.
+*   **Helper Functions:** Break down complex logic into smaller, reusable parts.
+*   **Base Cases:** Crucial for correct termination and handling edge cases in recursion.
+*   **Time-Space Trade-offs:** Simple solutions might be less optimal but easier to implement.
+*   **Tree Serialization:** Convert trees to linear structures for string/array algorithms.
 
 ## Where it applies
-This problem showcases fundamental tree traversal and comparison techniques.
-*   **Data Structures & Algorithms:** Binary Trees, Depth-First Search (DFS), Recursion.
-*   **When to reach for them:** Use these patterns when you need to compare tree structures, search for specific patterns within hierarchical data, or process all nodes in a tree.
-*   **Similar LeetCode Problems:**
+This problem highlights key tree concepts:
+*   **Tree Traversal (DFS):** Used for exploring all nodes, like finding max depth or path sums.
+*   **Tree Equality/Comparison:** Checking if two trees are identical in structure and values.
+*   **Substructure Search:** Finding a specific pattern within a larger tree.
+*   **Related LeetCode Problems:**
     *   100. Same Tree
     *   101. Symmetric Tree
-    *   226. Invert Binary Tree
+    *   104. Maximum Depth of Binary Tree
     *   236. Lowest Common Ancestor of a Binary Tree
