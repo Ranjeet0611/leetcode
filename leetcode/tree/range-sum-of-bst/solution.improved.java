@@ -1,46 +1,30 @@
-/**
- * Definition for a binary tree node.
- * public class TreeNode {
- *     int val;
- *     TreeNode left;
- *     TreeNode right;
- *     TreeNode() {}
- *     TreeNode(int val) { this.val = val; }
- *     TreeNode(int val, TreeNode left, TreeNode right) {
- *         this.val = val;
- *         this.left = left;
- *         this.right = right;
- *     }
- * }
- */
 class Solution {
     public int rangeSumBST(TreeNode root, int low, int high) {
         if (root == null) {
             return 0;
         }
 
-        int sum = 0;
-        // If current node's value is within the range, add it to sum
+        int currentSum = 0;
+
+        // If the current node's value is within the range, add it to the sum.
         if (root.val >= low && root.val <= high) {
-            sum += root.val;
+            currentSum += root.val;
         }
 
-        // If current node's value is greater than low,
-        // it's possible that its left child (and its subtree)
-        // could contain values within the range [low, high].
-        // So, traverse left.
+        // If root.val is greater than low, it's possible that values in the left subtree
+        // are within the range [low, high]. So, recursively check the left subtree.
+        // We only need to go left if root.val is not already too small to be the 'low' boundary.
         if (root.val > low) {
-            sum += rangeSumBST(root.left, low, high);
+            currentSum += rangeSumBST(root.left, low, high);
         }
 
-        // If current node's value is less than high,
-        // it's possible that its right child (and its subtree)
-        // could contain values within the range [low, high].
-        // So, traverse right.
+        // If root.val is less than high, it's possible that values in the right subtree
+        // are within the range [low, high]. So, recursively check the right subtree.
+        // We only need to go right if root.val is not already too large to be the 'high' boundary.
         if (root.val < high) {
-            sum += rangeSumBST(root.right, low, high);
+            currentSum += rangeSumBST(root.right, low, high);
         }
 
-        return sum;
+        return currentSum;
     }
 }
