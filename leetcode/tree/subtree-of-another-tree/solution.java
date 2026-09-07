@@ -14,19 +14,31 @@
  * }
  */
 class Solution {
-    boolean check(TreeNode root,TreeNode subRoot){
+    boolean solve(TreeNode root,TreeNode subRoot){
         if(root==null && subRoot==null){
             return true;
         }
         if(root==null || subRoot==null){
             return false;
         }
-        if(root.val==subRoot.val){
-            return check(root.left,subRoot.left) && check(root.right,subRoot.right);
+        if(root.val!=subRoot.val){
+            return false;
         }
-        return check(root.left,subRoot) || check(root.right,subRoot);
+        return solve(root.left,subRoot.left) && solve(root.right,subRoot.right);
+        
     }
     public boolean isSubtree(TreeNode root, TreeNode subRoot) {
-        return check(root,subRoot);
+        if(root==null && subRoot==null){
+            return true;
+        }
+        if(root==null || subRoot==null){
+            return false;
+        }
+        if(solve(root,subRoot)){
+            return true;
+        }
+        boolean left = isSubtree(root.left,subRoot);
+        boolean right = isSubtree(root.right,subRoot);
+        return left || right;
     }
 }
