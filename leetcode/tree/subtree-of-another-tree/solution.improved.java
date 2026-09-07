@@ -1,40 +1,103 @@
-public class Solution {
-    public boolean isSubtree(TreeNode root, TreeNode subRoot) {
-        // If subRoot is null, it's always a subtree (an empty tree is a subtree of any tree).
-        if (subRoot == null) {
-            return true;
-        }
-        // If root is null (and subRoot is not null), subRoot cannot be a subtree.
-        if (root == null) {
-            return false;
-        }
+```java
+import java.util.ArrayList;
+import java.util.List;
 
-        // Check if the tree rooted at 'root' is identical to 'subRoot'
-        if (isSameTree(root, subRoot)) {
-            return true;
-        }
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    // KMP algorithm for string matching
+    private boolean kmpSearch(List<Integer> text, List<Integer> pattern) {
+        if (pattern.isEmpty()) return true;
+        if (text.isEmpty()) return false;
 
-        // Otherwise, recursively check if subRoot is a subtree of root's left or right child
-        return isSubtree(root.left, subRoot) || isSubtree(root.right, subRoot);
+        int n = text.size();
+        int m = pattern.size();
+
+        int[] lps = computeLPSArray(pattern);
+
+        int i = 0; // index for text
+        int j = 0; // index for pattern
+        while (i < n) {
+            if (pattern.get(j).equals(text.get(i))) {
+                i++;
+                j++;
+            }
+            if (j == m) {
+                return true; // Pattern found
+            } else if (i < n && !pattern.get(j).equals(text.get(i))) {
+                if (j != 0) {
+                    j = lps[j - 1];
+                } else {
+                    i++;
+                }
+            }
+        }
+        return false;
     }
 
-    /**
-     * Helper function to check if two trees are structurally identical and have the same node values.
-     */
-    private boolean isSameTree(TreeNode p, TreeNode q) {
-        // Both are null, they are identical
-        if (p == null && q == null) {
-            return true;
+    private int[] computeLPSArray(List<Integer> pattern) {
+        int m = pattern.size();
+        int[] lps = new int[m];
+        int length = 0; // length of the previous longest prefix suffix
+        int i = 1;
+        lps[0] = 0; // lps[0] is always 0
+
+        while (i < m) {
+            if (pattern.get(i).equals(pattern.get(length))) {
+                length++;
+                lps[i] = length;
+                i++;
+            } else {
+                if (length != 0) {
+                    length = lps[length - 1];
+                } else {
+                    lps[i] = 0;
+                    i++;
+                }
+            }
         }
-        // One is null and the other is not, they are not identical
-        if (p == null || q == null) {
-            return false;
+        return lps;
+    }
+
+    // Serialize tree into a list of integers (pre-order traversal)
+    // Use a unique marker for null nodes (e.g., Integer.MIN_VALUE)
+    // Use another unique marker for boundary (e.g., Integer.MAX_VALUE) to distinguish nodes
+    private void serialize(TreeNode node, List<Integer> list) {
+        if (node == null) {
+            list.add(Integer.MIN_VALUE); // Marker for null
+            return;
         }
-        // Values are different, they are not identical
-        if (p.val != q.val) {
-            return false;
-        }
-        // Recursively check left and right subtrees
-        return isSameTree(p.left, q.left) && isSameTree(p.right, q.right);
+        list.add(node.val);
+        list.add(Integer.MAX_VALUE); // Delimiter for node value
+        serialize(node.left, list);
+        serialize(node.right, list);
+    }
+
+    public boolean isSubtree(TreeNode root, TreeNode subRoot) {
+        if (subRoot == null) return true; // An empty tree is a subtree of any tree
+        if (root == null) return false; // A non-empty subRoot cannot be a subtree of an empty root
+
+        List<Integer> rootSerialization = new ArrayList<>();
+        serialize(root, rootSerialization);
+
+        List<Integer> subRootSerialization = new ArrayList<>();
+        serialize(subRoot, subRootSerialization);
+
+        // Use KMP to check if subRootSerialization is a substring of rootSerialization
+        return kmpSearch(rootSerialization, subRootSerialization);
     }
 }
+```
