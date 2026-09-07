@@ -1,46 +1,51 @@
 ## Problem
-Calculate the sum of node values in a Binary Search Tree (BST) that fall within a specified inclusive range [low, high].
+Calculate the sum of all node values in a Binary Search Tree (BST) that fall within a specified inclusive range `[low, high]`.
 
 ## Approach
-The initial solution uses a recursive Depth-First Search (DFS). It traverses every node in the BST. For each node, it checks if its value is within the `[low, high]` range. If it is, the value is added to a running sum. This sum is stored in a global instance variable.
+This solution uses a recursive Depth-First Search (DFS). It efficiently traverses the BST.
+The key is to use BST properties to avoid unnecessary visits.
+
+1.  **Base Case**: If a node is null, return 0.
+2.  **Current Node**: If the current node's value is within `[low, high]`, add it to the sum.
+3.  **Pruning**:
+    *   If `root.val > low`, recursively check the left subtree. Nodes in the left subtree are smaller than `root.val`.
+    *   If `root.val < high`, recursively check the right subtree. Nodes in the right subtree are larger than `root.val`.
+This pruning avoids traversing branches that cannot contain valid nodes.
 
 ## Complexity
-*   **Time**: O(N), where N is the number of nodes. In the worst case, all nodes are visited.
-*   **Space**: O(H), where H is the height of the BST. This is due to the recursion stack. H can be O(N) for a skewed tree or O(log N) for a balanced tree.
+*   **Time**: O(N) in the worst case. N is the number of nodes. This happens if the range covers most nodes. On average, pruning reduces visited nodes. Each node is visited at most once.
+*   **Space**: O(H) for the recursion stack. H is the height of the BST. In a skewed tree, H can be N (O(N) space). In a balanced tree, H is log N (O(log N) space).
 
 ## Review
-The accepted solution has a few areas for improvement:
-*   **Global Variable**: Using a global variable (`ans`) for the sum is generally poor practice. It makes the function non-reentrant and can cause issues if the object is reused.
-*   **Unused Code**: An `int result = 0;` variable is declared but never used, which is dead code.
-*   **No BST Pruning**: The traversal visits both left and right subtrees unconditionally. It does not leverage the BST property to skip branches that cannot contain relevant values.
+The solution is clear, correct, and well-structured. It effectively uses recursion and BST properties.
+**Strengths**: Correct logic, easy to read, efficient due to pruning, uses a clean helper method.
+**Minor Suggestions**: The helper method could be explicitly `private`. The sum initialization is fine as is. These are not critical for performance or correctness.
 
 ## Improvements
-The solution can be optimized by leveraging the BST property:
-1.  **Eliminate Global Variable**: Modify the recursive function to return the sum of its subtree. This makes the function more modular and safer.
-2.  **Remove Unused Code**: Delete the `int result = 0;` line.
-3.  **Leverage BST Property for Pruning**:
-    *   If `root.val < low`, all values in the left subtree will also be less than `low`. So, only traverse the right subtree.
-    *   If `root.val > high`, all values in the right subtree will also be greater than `high`. So, only traverse the left subtree.
-    *   If `root.val` is within the range, add it and then traverse both subtrees. This significantly reduces visited nodes in many cases.
+The accepted solution is already optimal. No significant algorithmic improvements are possible. It correctly leverages BST properties for efficient pruning.
 
 ## Takeaways
-*   **Leverage Data Structure Properties**: Always use the specific properties of a data structure (like BST's ordered nature) to optimize algorithms.
-*   **Recursive Function Design**: Prefer passing parameters and returning values in recursive functions over using global variables for accumulating results. This leads to cleaner, more robust code.
-*   **Code Cleanliness**: Remove unused variables and redundant code to improve readability and maintainability.
+*   **Leverage BST Properties**: Always use the `left < parent < right` property for optimization.
+*   **Recursive DFS**: A natural pattern for many tree problems.
+*   **Pruning for Efficiency**: Eliminate subtrees that cannot contain solutions early.
+*   **Helper Methods**: Keep public APIs clean by using private helper functions for recursive logic.
 
 ## Where it applies
-This problem highlights fundamental concepts of **Binary Search Trees (BSTs)** and **Depth-First Search (DFS) traversals**.
+This problem highlights core concepts in tree traversal and Binary Search Trees.
 
-**Data Structures & Patterns**:
-*   **Binary Search Trees**: Essential for ordered data, enabling efficient search, insertion, and range queries.
-*   **Tree Traversal (DFS)**: A common way to visit all nodes in a tree.
-*   **Pruning Search Space**: A critical optimization technique in search algorithms to avoid unnecessary computations.
+**Data Structures and Patterns Used:**
+*   **Binary Search Trees (BSTs)**: For efficient sorted data storage and retrieval.
+*   **Recursion**: To break down problems into smaller, similar subproblems.
+*   **Depth-First Search (DFS)**: A common tree traversal strategy.
+*   **Pruning**: An optimization to reduce the search space.
 
-**When to reach for them**:
-*   When you need to store data in a sorted manner for quick lookups, insertions, or range-based queries.
-*   When processing hierarchical data structures.
+**When to reach for them:**
+*   When data needs to be stored in a sorted manner for quick lookups.
+*   For range queries or finding elements within a specific range.
+*   When traversing hierarchical data structures like trees.
 
-**Related LeetCode Problems**:
-*   **BST Operations**: 700. Search in a Binary Search Tree, 701. Insert into a Binary Search Tree, 450. Delete Node in a BST, 230. Kth Smallest Element in a BST.
-*   **BST Validation**: 98. Validate Binary Search Tree.
-*   **General Tree Traversal**: 104. Maximum Depth of Binary Tree, 226. Invert Binary Tree.
+**Other LeetCode Problems it Typically Unlocks:**
+*   94. Binary Tree Inorder Traversal
+*   98. Validate Binary Search Tree
+*   230. Kth Smallest Element in a BST
+*   235. Lowest Common Ancestor of a Binary Search Tree
